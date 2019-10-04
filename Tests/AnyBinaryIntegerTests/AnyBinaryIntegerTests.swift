@@ -1,13 +1,18 @@
 import XCTest
 @testable import AnyBinaryInteger
+import BigInt
+
+typealias BigNumber = AnyNumeric<BigInt>
 
 final class AnyBinaryIntegerTests: XCTestCase {
 
+    // MARK: - Equatable
     func testEquatable() {
         XCTAssertEqual(BigNumber(magnitude: 1), BigNumber(magnitude: 1))
         XCTAssertNotEqual(BigNumber(magnitude: 1), BigNumber(magnitude: 2))
     }
 
+    // MARK: AdditiveArithmetic & ExpressibleByIntegerLiteral
     func testAddition() {
         doTest(1, 1, expectedResult: 2, +)
         doTest(2, 3, expectedResult: 5, +)
@@ -18,10 +23,33 @@ final class AnyBinaryIntegerTests: XCTestCase {
         doTest(7, 7, expectedResult: 0, -)
     }
 
+    // MARK: - Numeric
+    func testMultiplication() {
+        doTest(1, 1, expectedResult: 1, *)
+        doTest(1, 2, expectedResult: 2, *)
+
+        doTest(0, 1, expectedResult: 0, *)
+        doTest(1, 0, expectedResult: 0, *)
+
+        doTest(2, 3, expectedResult: 6, *)
+        doTest(3, 2, expectedResult: 6, *)
+
+        doTest(2, 5, expectedResult: 10, *)
+        doTest(3, 5, expectedResult: 15, *)
+        doTest(3, 7, expectedResult: 21, *)
+    }
+
+    func testNumericFailableInitExactly() {
+        XCTAssertNil(AnyNumeric<BigUInt>(exactly: -1))
+        XCTAssertNotNil(AnyNumeric<BigInt>(exactly: -1))
+    }
+
     static var allTests = [
         ("testEquatable", testEquatable),
         ("testAddition", testAddition),
         ("testSubtraction", testSubtraction),
+        ("testMultiplication", testMultiplication),
+        ("testNumericFailableInitExactly", testNumericFailableInitExactly),
     ]
 }
 

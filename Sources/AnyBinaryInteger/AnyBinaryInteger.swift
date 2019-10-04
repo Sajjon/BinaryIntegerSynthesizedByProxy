@@ -1,12 +1,6 @@
 import BigInt
 
-// BinaryInteger
-// AdditiveArithmetic
-// Numeric
-
-public typealias BigNumber = AnyAdditiveArithmetic<BigInt>
-
-public struct AnyAdditiveArithmetic<Magnitude>: AdditiveArithmetic & ExpressibleByIntegerLiteral where Magnitude: BinaryInteger {
+public struct AnyNumeric<Magnitude>: Numeric where Magnitude: BinaryInteger {
 
     public let magnitude: Magnitude
 
@@ -15,7 +9,7 @@ public struct AnyAdditiveArithmetic<Magnitude>: AdditiveArithmetic & Expressible
     }
 }
 
-private extension AnyAdditiveArithmetic {
+private extension AnyNumeric {
 
     static func forward(
         _ lhs: Self, _ rhs: Self,
@@ -43,7 +37,7 @@ private extension AnyAdditiveArithmetic {
 }
 
 // MARK: - Equatable
-public extension AnyAdditiveArithmetic {
+public extension AnyNumeric {
 
     static func == (lhs: Self, rhs: Self) -> Bool {
         return forwardMagnitude(lhs, rhs, ==)
@@ -51,7 +45,7 @@ public extension AnyAdditiveArithmetic {
 }
 
 // MARK: - AdditiveArithmetic
-public extension AnyAdditiveArithmetic {
+public extension AnyNumeric {
 
     /// The zero value.
     static var zero: Self { .init(magnitude: .zero) }
@@ -78,8 +72,24 @@ public extension AnyAdditiveArithmetic {
 }
 
 // MARK: - ExpressibleByIntegerLiteral
-public extension AnyAdditiveArithmetic {
+public extension AnyNumeric {
     init(integerLiteral value: Magnitude.IntegerLiteralType) {
         self.init(magnitude: Magnitude(integerLiteral: value))
+    }
+}
+
+// MARK: - Numeric
+public extension AnyNumeric {
+    init?<T>(exactly source: T) where T : BinaryInteger {
+        guard let magnitude = Magnitude(exactly: source) else { return nil }
+        self.init(magnitude: magnitude)
+    }
+
+    static func * (lhs: Self, rhs: Self) -> Self {
+        forward(lhs, rhs, *)
+    }
+
+    static func *= (lhs: inout Self, rhs: Self) {
+        lhs = (lhs * rhs)
     }
 }

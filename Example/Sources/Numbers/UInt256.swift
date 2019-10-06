@@ -6,5 +6,6 @@
 //
 
 import Foundation
+import DelTal
 
-public typealias UInt256 = BoundUnsignedInteger<UInt256Bound>
+public typealias UInt256 = BoundUnsignedInteger<UInt256Bound, NoTrait>

@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import UnsignedIntegerSynthesizedByProxy
+@testable import Example
 import BigInt
 
 final class Positive256Tests: XCTestCase {

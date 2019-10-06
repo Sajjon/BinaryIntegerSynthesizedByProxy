@@ -1,41 +1,55 @@
-//
-//  File.swift
-//  
-//
-//  Created by Alexander Cyon on 2019-10-06.
-//
-
-import Foundation
-@testable import UnsignedIntegerSynthesizedByProxy
-
-private typealias UI32 = AnyInteger<UInt32>
-
 import XCTest
+@testable import Example
+import BigInt
 
-class UInt32ViaProxyTests: XCTestCase {
+final class UInt256Tests: XCTestCase {
 
     static var allTests = [
-        ("testCompareMagnitudeToUInt32", testCompareMagnitudeToUInt32),
+        ("testEmptyInitResultsInZero", testEmptyInitResultsInZero),
+        ("testMax", testMax),
+        ("testMin", testMin),
+        ("testMinIsZero", testMinIsZero),
         ("testEquatable", testEquatable),
         ("testAddition", testAddition),
         ("testSubtraction", testSubtraction),
         ("testMultiplication", testMultiplication),
-        ("testMin", testMin),
     ]
 
-    func testCompareMagnitudeToUInt32() {
-        XCTAssertEqual(UI32.zero.magnitude, UInt32.zero.magnitude)
-        XCTAssertEqual(UI32(1).magnitude, UInt32(1).magnitude)
+    func testEmptyInitResultsInZero() {
+        XCTAssertEqual(UInt256().magnitude, 0)
+    }
+
+    func testMax() {
+        XCTAssertEqual(
+            UInt256.max.magnitude,
+            UInt256Bound.maxValue
+        )
+    }
+
+    func testMinIsZero() {
+        XCTAssertEqual(
+            UInt256.min,
+            UInt256.zero
+        )
     }
 
     func testMin() {
-        XCTAssertEqual(UI32.min, UI32.zero)
+        XCTAssertEqual(
+            UInt256.min.magnitude,
+            UInt256Bound.minValue
+        )
+
+        XCTAssertEqual(
+            UInt256.min,
+            UInt256()
+        )
     }
+
 
     // MARK: - Equatable
     func testEquatable() {
-        XCTAssertEqual(UI32(magnitude: 1), UI32(magnitude: 1))
-        XCTAssertNotEqual(UI32(magnitude: 1), UI32(magnitude: 2))
+        XCTAssertEqual(UInt256(magnitude: 1), UInt256(magnitude: 1))
+        XCTAssertNotEqual(UInt256(magnitude: 1), UInt256(magnitude: 2))
     }
 
     // MARK: AdditiveArithmetic & ExpressibleByIntegerLiteral
@@ -66,11 +80,11 @@ class UInt32ViaProxyTests: XCTestCase {
     }
 }
 
-private extension UInt32ViaProxyTests {
+private extension UInt256Tests {
     func doTest<Result>(
-        _ lhs: UI32, _ rhs: UI32,
+        _ lhs: UInt256, _ rhs: UInt256,
         expectedResult: Result,
-        _ combine: (UI32, UI32) -> Result
+        _ combine: (UInt256, UInt256) -> Result
     ) where Result: Equatable {
         XCTAssertEqual(combine(lhs, rhs), expectedResult)
     }

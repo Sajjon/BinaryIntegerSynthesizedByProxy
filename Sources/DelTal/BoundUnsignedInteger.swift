@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct BoundUnsignedInteger<MagnitudeChecker>:
+public struct BoundUnsignedInteger<MagnitudeChecker, Trait>:
     UnsignedIntegerSynthesizedByProxy where
     MagnitudeChecker: ValueChecker,
     MagnitudeChecker.Value: BinaryInteger,

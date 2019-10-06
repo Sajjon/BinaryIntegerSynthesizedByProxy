@@ -7,4 +7,6 @@
 
 import Foundation
 
-public typealias Positive256 = BoundUnsignedInteger<Positive256Bound>
+public protocol IntegerTrait {
+    static var context: String { get }
+}

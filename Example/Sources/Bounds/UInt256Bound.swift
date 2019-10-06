@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import DelTal
 import BigInt /* attaswift/BigInt */
 
 public struct UInt256Bound: Bound {}

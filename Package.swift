@@ -4,12 +4,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "UnsignedIntegerSynthesizedByProxy",
+    name: "DelTal",
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(
-            name: "UnsignedIntegerSynthesizedByProxy",
-            targets: ["UnsignedIntegerSynthesizedByProxy"]),
+            name: "DelTal",
+            targets: ["DelTal"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -19,10 +19,21 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
-            name: "UnsignedIntegerSynthesizedByProxy",
-            dependencies: ["BigInt"]),
+            name: "DelTal",
+            path: "Sources"
+        ),
         .testTarget(
-            name: "UnsignedIntegerSynthesizedByProxyTests",
-            dependencies: ["UnsignedIntegerSynthesizedByProxy", "BigInt"]),
+            name: "DelTalTests",
+            dependencies: ["DelTal"],
+            path: "Tests"),
+
+        .target(
+            name: "Example",
+            dependencies: ["DelTal", "BigInt"],
+            path: "Example/Sources"),
+        .testTarget(
+            name: "ExampleTests",
+            dependencies: ["Example", "DelTal", "BigInt"],
+            path: "Example/Tests")
     ]
 )

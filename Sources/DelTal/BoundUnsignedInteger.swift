@@ -7,11 +7,17 @@
 
 import Foundation
 
-public struct BoundUnsignedInteger<MagnitudeChecker, Trait>:
-    UnsignedIntegerSynthesizedByProxy where
+/// `BUNCInt` is an abbreviation for `Bound Unsigned Named Categorized Integer`
+public struct BUNCInt<MagnitudeChecker, Name, Category>:
+    UnsignedIntegerSynthesizedByProxy,
+    CustomStringConvertible,
+    CustomDebugStringConvertible
+where
     MagnitudeChecker: ValueChecker,
     MagnitudeChecker.Value: BinaryInteger,
-    MagnitudeChecker.Value.Magnitude == MagnitudeChecker.Value
+    MagnitudeChecker.Value.Magnitude == MagnitudeChecker.Value,
+    Name: IntegerName,
+    Category: IntegerCategory
 {
 
     public typealias Magnitude = MagnitudeChecker.Value
@@ -23,8 +29,22 @@ public struct BoundUnsignedInteger<MagnitudeChecker, Trait>:
 
 }
 
-public extension BoundUnsignedInteger {
+public extension BUNCInt {
     typealias IntegerLiteralType = Magnitude.IntegerLiteralType
 
     typealias Words = Magnitude.Words
+}
+
+// MARK: - CustomStringConvertible
+public extension BUNCInt {
+    var description: String {
+        "\(magnitude) \(Name.nameOfInteger)"
+    }
+}
+
+// MARK: - CustomDebugStringConvertible
+public extension BUNCInt {
+    var debugDescription: String {
+        "\(self.description) (\(Category.nameOfCategory))"
+    }
 }

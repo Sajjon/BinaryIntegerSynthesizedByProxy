@@ -8,4 +8,12 @@
 import Foundation
 import DelTal
 
-public typealias UInt256 = BoundUnsignedInteger<UInt256Bound, NoTrait>
+public typealias UInt256 = BUNCInt<UInt256Bound, UInt256Name, NoCategory>
+
+public struct UInt256Name: IntegerName {
+    public static let nameOfInteger = "UInt256"
+}
+
+public struct NoCategory: IntegerCategory {
+    public static let nameOfCategory = "Uncategorized"
+}

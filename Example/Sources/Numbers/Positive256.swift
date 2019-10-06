@@ -8,4 +8,8 @@
 import Foundation
 import DelTal
 
-public typealias Positive256 = BoundUnsignedInteger<Positive256Bound, NoTrait>
+public typealias Positive256 = BUNCInt<Positive256Bound, Positive256Name, NoCategory>
+
+public struct Positive256Name: IntegerName {
+    public static let nameOfInteger = "Positive256"
+}

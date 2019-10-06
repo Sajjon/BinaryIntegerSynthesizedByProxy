@@ -8,7 +8,7 @@
 import Foundation
 @testable import DelTal
 
-private typealias UI32 = AnyInteger<UInt32>
+private typealias UI32 = AnyUnsignedInteger<UInt32>
 
 import XCTest
 

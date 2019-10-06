@@ -7,6 +7,6 @@
 
 import Foundation
 
-public struct NoTrait: IntegerTrait {
-    public static let context = "NoTrait"
+public protocol IntegerName {
+    static var nameOfInteger: String { get }
 }

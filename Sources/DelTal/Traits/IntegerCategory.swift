@@ -7,6 +7,6 @@
 
 import Foundation
 
-public protocol IntegerTrait {
-    static var context: String { get }
+public protocol IntegerCategory {
+    static var nameOfCategory: String { get }
 }

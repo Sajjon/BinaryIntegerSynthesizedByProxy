@@ -15,4 +15,3 @@ public extension Positive256Bound {
     static var maxValue: Value { UInt256Bound.maxValue }
     static var minValue: Value { 1 }
 }
-

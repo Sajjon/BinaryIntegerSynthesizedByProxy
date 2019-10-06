@@ -2,18 +2,19 @@
 
 Conform to [Swift protocol `UnsignedInteger`](https://developer.apple.com/documentation/swift/unsignedinteger) by proxy with the option of adding bounds using a `typealias`.
 
-This way you can follow [Object Callestnics's](https://williamdurand.fr/2013/06/03/object-calisthenics/)(making you a better programmer!) [third rule 'Wrap All Primitives And Strings'](https://williamdurand.fr/2013/06/03/object-calisthenics/#3-wrap-all-primitives-and-strings) for your number types in the most convenient way. While still having the power of Swift's `UnsignedInteger` (and thus `BinaryInteger`) protocol, making your code both type safe, easy to read and convenient to use.
+This way you can follow [Object Callestnics's](https://williamdurand.fr/2013/06/03/object-calisthenics/) (making you a better programmer) [third rule 'Wrap All Primitives And Strings'](https://williamdurand.fr/2013/06/03/object-calisthenics/#3-wrap-all-primitives-and-strings) for your number types in the most convenient way. While still having the power of Swift's `UnsignedInteger` (and thus `BinaryInteger`) protocol, making your code both type safe, easy to read and convenient to use.
 
 # Example
 
 Imagine you want to define a `UInt256` and a `UInt512` and a `UInt4096` or what ever. Using excellent [attaswift/BigInt ](https://github.com/attaswift/BigInt) we have a `BigInt` type. Using that and this Swift package, we can easily create those types **and let them automagically conform to `UnsignedInteger` protocol**.
 
-Simplest example is using the `AnyUnsignedInteger` `typealias`, like this:
+Simplest example is using `AnyUnsignedInteger`, like this:
 ```swift
 typealias BigNumber = AnyUnsignedInteger<BigUInt>
 ```
 
-Where AnySig is just a typealias it self, for:
+Where `AnyUnsignedInteger` is just a `typealias` itself:
+
 ```swift
 typealias AnyUnsignedInteger<Value> = BUNCInt<
     NoBound<Value>,
@@ -41,7 +42,7 @@ _BUNCInt_ is short _**Bound** **U**nsigned **N**amed **C**ategorized Integer_ fo
 
 But in this example it is not at all clear why we would want to use `AnyUnsignedInteger<BigUInt>` instead of `BigUInt` right away. So let's look at some more examples.
 
-### `UInt256` by a `typealias`
+### `UInt256`
 
 And then:
 ```swift
@@ -116,29 +117,29 @@ public extension BUNCInt.Water where Name == KelvinName, Category == Temperatur 
 
 Now we can use the `Kelvin` type like this:
 ```swift
-    func testMeltTemperatur() {
-        XCTAssertEqual(Kelvin.Water.meltsAt, 273)
-        XCTAssertEqual(
-            Kelvin.Water.boilsAt - Kelvin.Water.meltsAt, 
-            100
-        )
-    }
+func testMeltTemperatur() {
+    XCTAssertEqual(Kelvin.Water.meltsAt, 273)
+    XCTAssertEqual(
+        Kelvin.Water.boilsAt - Kelvin.Water.meltsAt, 
+        100
+    )
+}
 ```
 
 Another advantage of the generic `Name` and `Category` of `BUNCInt` is that we get context to our values, which we are using conforming to `CustomStringConvertible` and `CustomDebugStringConvertible`, resulting in this.
 
 ```swift
-    func testKelvinDescription() {
-        XCTAssertEqual(
-            Kelvin.Water.boilsAt.description, 
-            "373 Kelvin"
-        )
+func testKelvinDescription() {
+    XCTAssertEqual(
+        Kelvin.Water.boilsAt.description, 
+        "373 Kelvin"
+    )
 
-        XCTAssertEqual(
-            Kelvin.Water.boilsAt.debugDescription,
-            "373 Kelvin (Temperature)"
-        )
-    }
+    XCTAssertEqual(
+        Kelvin.Water.boilsAt.debugDescription,
+        "373 Kelvin (Temperature)"
+    )
+}
 ```
 
 # Installation

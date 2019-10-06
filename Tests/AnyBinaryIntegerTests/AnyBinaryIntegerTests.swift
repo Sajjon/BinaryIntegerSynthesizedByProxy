@@ -2,7 +2,7 @@ import XCTest
 @testable import AnyBinaryInteger
 import BigInt
 
-typealias BigNumber = AnyNumeric<BigInt>
+private typealias BigNumber = AnyBinaryInteger<BigUInt>
 
 final class AnyBinaryIntegerTests: XCTestCase {
 
@@ -40,8 +40,7 @@ final class AnyBinaryIntegerTests: XCTestCase {
     }
 
     func testNumericFailableInitExactly() {
-        XCTAssertNil(AnyNumeric<BigUInt>(exactly: -1))
-        XCTAssertNotNil(AnyNumeric<BigInt>(exactly: -1))
+        XCTAssertNil(AnyBinaryInteger<BigUInt>(exactly: -1))
     }
 
     static var allTests = [

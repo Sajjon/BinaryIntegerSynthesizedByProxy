@@ -1,7 +1,8 @@
 import XCTest
 
-import AnyBinaryIntegerTests
+import BinaryIntegerSynthesizedByProxyTests
 
 var tests = [XCTestCaseEntry]()
-tests += AnyBinaryIntegerTests.allTests()
+tests += UInt256Tests.allTests()
+tests += UInt32ViaProxyTests.allTests()
 XCTMain(tests)

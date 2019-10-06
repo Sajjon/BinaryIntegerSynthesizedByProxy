@@ -1,8 +1,15 @@
 import XCTest
-@testable import AnyBinaryInteger
+@testable import BinaryIntegerSynthesizedByProxy
 import BigInt
 
-final class AnyBinaryIntegerTests: XCTestCase {
+final class UInt256Tests: XCTestCase {
+
+    static var allTests = [
+        ("testEquatable", testEquatable),
+        ("testAddition", testAddition),
+        ("testSubtraction", testSubtraction),
+        ("testMultiplication", testMultiplication),
+    ]
 
     // MARK: - Equatable
     func testEquatable() {
@@ -36,16 +43,9 @@ final class AnyBinaryIntegerTests: XCTestCase {
         doTest(3, 5, expectedResult: 15, *)
         doTest(3, 7, expectedResult: 21, *)
     }
-
-    static var allTests = [
-        ("testEquatable", testEquatable),
-        ("testAddition", testAddition),
-        ("testSubtraction", testSubtraction),
-        ("testMultiplication", testMultiplication),
-    ]
 }
 
-private extension AnyBinaryIntegerTests {
+private extension UInt256Tests {
     func doTest<Result>(
         _ lhs: UInt256, _ rhs: UInt256,
         expectedResult: Result,

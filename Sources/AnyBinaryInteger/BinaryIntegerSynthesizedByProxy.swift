@@ -1,31 +1,68 @@
-//
-//  File.swift
-//  
-//
-//  Created by Alexander Cyon on 2019-10-05.
-//
-
 import Foundation
-import BigInt
 
 public protocol BinaryIntegerSynthesizedByProxy:
     BinaryInteger
 where
-    IntegerLiteralType == Magnitude.IntegerLiteralType
+    Words == Magnitude.Words,
+    MagnitudeChecker.Value == Magnitude
 {
-    var proxy: Proxy { get }
-    init(proxy: Proxy)
+    associatedtype MagnitudeChecker: ValueChecker
+    init(check value: Magnitude) throws
 }
 
 public extension BinaryIntegerSynthesizedByProxy {
-    typealias Proxy = AnyBinaryInteger<Magnitude>
-    var magnitude: Magnitude { proxy.magnitude }
+    /// Crashing init
+    init(magnitude: Magnitude) {
+        do {
+            try self.init(check: magnitude)
+        } catch {
+            badLiteralValue(magnitude, error: error)
+        }
+    }
+}
+
+public extension BinaryIntegerSynthesizedByProxy {
+    var words: Words { magnitude.words }
+
+    static var isSigned: Bool { Magnitude.isSigned }
+
+    var bitWidth: Int { magnitude.bitWidth }
+
+    var trailingZeroBitCount: Int { magnitude.trailingZeroBitCount }
+}
+
+private extension BinaryIntegerSynthesizedByProxy {
+
+    static func forward(
+        _ lhs: Self, _ rhs: Self,
+        _ combine: @escaping (Magnitude, Magnitude) -> Magnitude
+    ) -> Self {
+        let combinedMagnitude: Magnitude = forwardMagnitude(lhs, rhs, combine)
+        return Self(magnitude: combinedMagnitude)
+    }
+
+    static func forwardMagnitude<Result>(
+        _ lhs: Self, _ rhs: Self,
+        _ combine: @escaping (Magnitude, Magnitude) -> Result
+    ) -> Result {
+        return forwardMapCombine(lhs, rhs, mapper: { $0.magnitude }, combine: combine)
+    }
+
+    static func forwardMapCombine<Result, Value>(
+        _ lhs: Self, _ rhs: Self,
+        mapper: (Self) -> Value,
+        combine: (Value, Value) -> Result
+    ) -> Result {
+        return combine(mapper(lhs), mapper(rhs))
+    }
+
 }
 
 // MARK: - Equatable
 public extension BinaryIntegerSynthesizedByProxy {
+
     static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.proxy == rhs.proxy
+        return forwardMagnitude(lhs, rhs, ==)
     }
 }
 
@@ -33,10 +70,12 @@ public extension BinaryIntegerSynthesizedByProxy {
 public extension BinaryIntegerSynthesizedByProxy {
 
     /// The zero value.
-    static var zero: Self { .init(proxy: Proxy.zero) }
+    static var zero: Self { .init(magnitude: .zero) }
 
     /// Adds two values and produces their sum.
-    static func + (_ lhs: Self, _ rhs: Self) -> Self { .init(proxy: lhs.proxy + rhs.proxy) }
+    static func + (_ lhs: Self, _ rhs: Self) -> Self {
+        forward(lhs, rhs, +)
+    }
 
     /// Adds two values and stores the result in the left-hand-side variable.
     static func += (_ lhs: inout Self, _ rhs: Self) {
@@ -44,7 +83,9 @@ public extension BinaryIntegerSynthesizedByProxy {
     }
 
     /// Subtracts one value from another and produces their difference.
-    static func - (_ lhs: Self, _ rhs: Self) -> Self { .init(proxy: lhs.proxy - rhs.proxy) }
+    static func - (_ lhs: Self, _ rhs: Self) -> Self {
+        forward(lhs, rhs, -)
+    }
 
     /// Subtracts the second value from the first and stores the difference in the left-hand-side variable.
     static func -= (_ lhs: inout Self, _ rhs: Self) {
@@ -52,40 +93,26 @@ public extension BinaryIntegerSynthesizedByProxy {
     }
 }
 
+// MARK: - ExpressibleByIntegerLiteral
+public extension BinaryIntegerSynthesizedByProxy {
+    init(integerLiteral value: Magnitude.IntegerLiteralType) {
+        self.init(magnitude: Magnitude(integerLiteral: value))
+    }
+}
+
 // MARK: - Numeric
 public extension BinaryIntegerSynthesizedByProxy {
-
-    static var isSigned: Bool { Proxy.isSigned }
-
-    var bitWidth: Int { proxy.bitWidth }
-
-    var trailingZeroBitCount: Int { proxy.trailingZeroBitCount }
-
-    var words: Magnitude.Words { proxy.words }
-
     init?<T>(exactly source: T) where T : BinaryInteger {
-        fatalError("not supported")
+        guard let magnitude = Magnitude(exactly: source) else { return nil }
+        self.init(magnitude: magnitude)
     }
 
-    static func * (lhs: Self, rhs: Self) -> Self { .init(proxy: lhs.proxy * rhs.proxy) }
+    static func * (lhs: Self, rhs: Self) -> Self {
+        forward(lhs, rhs, *)
+    }
 
     static func *= (lhs: inout Self, rhs: Self) {
         lhs = (lhs * rhs)
-    }
-
-}
-
-// MARK: - ExpressibleByIntegerLiteral
-public extension BinaryIntegerSynthesizedByProxy {
-    init(integerLiteral value: IntegerLiteralType) {
-        fatalError("not supported")
-    }
-}
-
-// MARK: - Hashable
-public extension BinaryIntegerSynthesizedByProxy {
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(magnitude)
     }
 }
 
@@ -137,8 +164,13 @@ public extension BinaryIntegerSynthesizedByProxy {
     }
 
     prefix static func ~ (x: Self) -> Self {
-//        let tildeMagnitude: Magnitude = ~x.magnitude
-        whatToDo()
+        let tildeMagnitude: Magnitude = ~x.magnitude
+//        do {
+//            return try self.init(magnitude: tildeMagnitude)
+            return self.init(magnitude: tildeMagnitude)
+//        } catch {
+//            incorrectImplementationShouldAlwaysBeAble(to: "Error performing `~`, error: \(error)")
+//        }
     }
 
     static func >> <RHS>(lhs: Self, rhs: RHS) -> Self where RHS: BinaryInteger {
@@ -162,78 +194,66 @@ public extension BinaryIntegerSynthesizedByProxy {
 
 public extension BinaryIntegerSynthesizedByProxy {
     init<T>(truncatingIfNeeded source: T) where T: BinaryInteger {
-//        let magnitude = Magnitude(truncatingIfNeeded: source)
-//        self.init(magnitude: magnitude)
-
-        whatToDo()
-
-
-        //        if magnitude > Bound.greatestFiniteMagnitude {
-        //            self.magnitude = Bound.greatestFiniteMagnitude
-        //        } else if magnitude < Bound.leastNormalMagnitude {
-        //            self.magnitude = Bound.leastNormalMagnitude
-        //        } else {
-        //            self.magnitude = magnitude
-        //        }
+        let magnitude = Magnitude(truncatingIfNeeded: source)
+        self.init(magnitude: magnitude)
+//        if magnitude > Bound.greatestFiniteMagnitude {
+//            self.magnitude = Bound.greatestFiniteMagnitude
+//        } else if magnitude < Bound.leastNormalMagnitude {
+//            self.magnitude = Bound.leastNormalMagnitude
+//        } else {
+//            self.magnitude = magnitude
+//        }
     }
 
     init?<T>(exactly source: T) where T: BinaryFloatingPoint {
-//        guard let magnitude = Magnitude(exactly: source) else { return nil }
-//        try? self.init(magnitude: magnitude)
-        whatToDo()
-
+        guard let magnitude = Magnitude(exactly: source) else { return nil }
+        try? self.init(magnitude: magnitude)
     }
 
     /// Creates the least possible amount
     init() {
-        whatToDo()
+        self.init(magnitude: Magnitude.zero)
 //        self.magnitude = Magnitude.zero
     }
 
     init<T>(_ source: T) where T: BinaryInteger {
-//        let magnitude = Magnitude(source)
-//        do {
-//            try self.init(magnitude: magnitude)
-//        } catch {
-//            badLiteralValue(source, error: error)
-//        }
-        whatToDo()
-
+        let magnitude = Magnitude(source)
+        do {
+            try self.init(magnitude: magnitude)
+        } catch {
+            badLiteralValue(source, error: error)
+        }
     }
 
     init<T>(_ source: T) where T: BinaryFloatingPoint {
-//        let magnitude = Magnitude(source)
-//        do {
-//            try self.init(magnitude: magnitude)
-//        } catch {
-//            badLiteralValue(source, error: error)
-//        }
-        whatToDo()
-
+        let magnitude = Magnitude(source)
+        do {
+            try self.init(magnitude: magnitude)
+        } catch {
+            badLiteralValue(source, error: error)
+        }
     }
 
     init<T>(clamping source: T) where T: BinaryInteger {
-//        let magnitude = Magnitude(clamping: source)
-        //        if magnitude > Bound.greatestFiniteMagnitude {
-        //            self.magnitude = Bound.greatestFiniteMagnitude
-        //        } else if magnitude < Bound.leastNormalMagnitude {
-        //            self.magnitude = Bound.leastNormalMagnitude
-        //        } else {
-        //            self.magnitude = magnitude
-        //        }
-//        self.init(magnitude: magnitude)
-        whatToDo()
-
+        let magnitude = Magnitude(clamping: source)
+//        if magnitude > Bound.greatestFiniteMagnitude {
+//            self.magnitude = Bound.greatestFiniteMagnitude
+//        } else if magnitude < Bound.leastNormalMagnitude {
+//            self.magnitude = Bound.leastNormalMagnitude
+//        } else {
+//            self.magnitude = magnitude
+//        }
+        self.init(magnitude: magnitude)
     }
 
-    //    init(integerLiteral value: Magnitude.IntegerLiteralType) {
-    //        let magnitude = Magnitude.init(integerLiteral: value)
-    //        do {
-    //            try self.init(magnitude: magnitude)
-    //        } catch {
-    //            badLiteralValue(value, error: error)
-    //        }
-    //    }
+//    init(integerLiteral value: Magnitude.IntegerLiteralType) {
+//        let magnitude = Magnitude.init(integerLiteral: value)
+//        do {
+//            try self.init(magnitude: magnitude)
+//        } catch {
+//            badLiteralValue(value, error: error)
+//        }
+//    }
 }
 
 
@@ -266,10 +286,8 @@ private extension BinaryIntegerSynthesizedByProxy {
     ) throws -> Self {
         precondition(overflowCheck() == false, "Overflow")
         let result = try calculateMagnitude(lhs.magnitude, rhs.magnitude, operation: operation)
-        //        return try Self(magnitude: result)
-//        return Self(magnitude: result)
-        whatToDo()
-
+//        return try Self(magnitude: result)
+        return Self(magnitude: result)
     }
 
     static func calculateMagnitude(
@@ -280,7 +298,7 @@ private extension BinaryIntegerSynthesizedByProxy {
     ) throws -> Magnitude {
         precondition(overflowCheck() == false, "Overflow")
         let result = operation(lhs, rhs)
-        //        try Bound.contains(value: result)
+//        try Bound.contains(value: result)
         return result
     }
 
@@ -296,10 +314,38 @@ public extension BinaryIntegerSynthesizedByProxy {
         return lhs.magnitude > rhs.magnitude
     }
 
-    //    static func == (lhs: Self, rhs: Self) -> Bool {
-    //        return lhs.magnitude == rhs.magnitude
-    //    }
+//    static func == (lhs: Self, rhs: Self) -> Bool {
+//        return lhs.magnitude == rhs.magnitude
+//    }
 }
 
-func whatToDo() -> Never { fatalError("What to do?") }
-var placeholder: Never { fatalError("Placeholder") }
+
+internal func incorrectImplementationShouldAlwaysBeAble(
+    to reason: String,
+    _ error: Swift.Error? = nil,
+    _ file: String = #file,
+    _ line: Int = #line
+) -> Never {
+    let errorString = error.map { ", error: \($0) " } ?? ""
+    incorrectImplementation("Should always be to: \(reason)\(errorString)")
+}
+
+internal func incorrectImplementation(
+    _ reason: String? = nil,
+    _ file: String = #file,
+    _ line: Int = #line
+) -> Never {
+    let reasonString = reason != nil ? "`\(reason!)`" : ""
+    let message = "Incorrect implementation: \(reasonString),\nIn file: \(file), line: \(line)"
+    fatalError(message)
+}
+
+internal func badLiteralValue<Value>(
+    _ value: Value,
+    error: Swift.Error,
+    _ file: String = #file,
+    _ line: Int = #line
+) -> Never {
+    let message = "Passed bad literal value: `\(value)` to non-throwing ExpressibleByFoobarLiteral initializer, resulting in error: `\(error)`, in file: \(file), line: \(line)"
+    fatalError(message)
+}

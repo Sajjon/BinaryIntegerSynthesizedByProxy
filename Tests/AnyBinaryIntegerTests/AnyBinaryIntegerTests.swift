@@ -2,14 +2,12 @@ import XCTest
 @testable import AnyBinaryInteger
 import BigInt
 
-private typealias BigNumber = AnyBinaryInteger<BigUInt>
-
 final class AnyBinaryIntegerTests: XCTestCase {
 
     // MARK: - Equatable
     func testEquatable() {
-        XCTAssertEqual(BigNumber(magnitude: 1), BigNumber(magnitude: 1))
-        XCTAssertNotEqual(BigNumber(magnitude: 1), BigNumber(magnitude: 2))
+        XCTAssertEqual(UInt256(magnitude: 1), UInt256(magnitude: 1))
+        XCTAssertNotEqual(UInt256(magnitude: 1), UInt256(magnitude: 2))
     }
 
     // MARK: AdditiveArithmetic & ExpressibleByIntegerLiteral
@@ -39,24 +37,19 @@ final class AnyBinaryIntegerTests: XCTestCase {
         doTest(3, 7, expectedResult: 21, *)
     }
 
-    func testNumericFailableInitExactly() {
-        XCTAssertNil(AnyBinaryInteger<BigUInt>(exactly: -1))
-    }
-
     static var allTests = [
         ("testEquatable", testEquatable),
         ("testAddition", testAddition),
         ("testSubtraction", testSubtraction),
         ("testMultiplication", testMultiplication),
-        ("testNumericFailableInitExactly", testNumericFailableInitExactly),
     ]
 }
 
 private extension AnyBinaryIntegerTests {
     func doTest<Result>(
-        _ lhs: BigNumber, _ rhs: BigNumber,
+        _ lhs: UInt256, _ rhs: UInt256,
         expectedResult: Result,
-        _ combine: (BigNumber, BigNumber) -> Result
+        _ combine: (UInt256, UInt256) -> Result
     ) where Result: Equatable {
         XCTAssertEqual(combine(lhs, rhs), expectedResult)
     }

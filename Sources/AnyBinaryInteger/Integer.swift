@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Integer<Magnitude>: BinaryIntegerByProxy where
+public struct Integer<Magnitude>: BinaryIntegerSynthesizedByProxy where
     Magnitude: BinaryInteger,
     Magnitude.Magnitude == Magnitude {
 

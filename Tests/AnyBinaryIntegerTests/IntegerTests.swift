@@ -10,7 +10,7 @@ extension BigNumber {
     }
 }
 
-final class BinaryIntegerByProxyTests: XCTestCase {
+final class BinaryIntegerSynthesizedByProxyTests: XCTestCase {
 
     // MARK: - Equatable
     func testEquatable() {
@@ -72,7 +72,7 @@ final class BinaryIntegerByProxyTests: XCTestCase {
     ]
 }
 
-private extension BinaryIntegerByProxyTests {
+private extension BinaryIntegerSynthesizedByProxyTests {
     func doTest<Result>(
         _ lhs: BigNumber, _ rhs: BigNumber,
         expectedResult: Result,

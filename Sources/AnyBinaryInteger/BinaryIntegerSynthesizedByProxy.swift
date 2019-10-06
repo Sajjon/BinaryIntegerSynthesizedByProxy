@@ -8,7 +8,7 @@
 import Foundation
 import BigInt
 
-public protocol BinaryIntegerByProxy:
+public protocol BinaryIntegerSynthesizedByProxy:
     BinaryInteger
 where
     IntegerLiteralType == Magnitude.IntegerLiteralType
@@ -17,20 +17,20 @@ where
     init(proxy: Proxy)
 }
 
-public extension BinaryIntegerByProxy {
+public extension BinaryIntegerSynthesizedByProxy {
     typealias Proxy = AnyBinaryInteger<Magnitude>
     var magnitude: Magnitude { proxy.magnitude }
 }
 
 // MARK: - Equatable
-public extension BinaryIntegerByProxy {
+public extension BinaryIntegerSynthesizedByProxy {
     static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.proxy == rhs.proxy
     }
 }
 
 // MARK: - AdditiveArithmetic
-public extension BinaryIntegerByProxy {
+public extension BinaryIntegerSynthesizedByProxy {
 
     /// The zero value.
     static var zero: Self { .init(proxy: Proxy.zero) }
@@ -53,7 +53,7 @@ public extension BinaryIntegerByProxy {
 }
 
 // MARK: - Numeric
-public extension BinaryIntegerByProxy {
+public extension BinaryIntegerSynthesizedByProxy {
 
     static var isSigned: Bool { Proxy.isSigned }
 
@@ -76,14 +76,14 @@ public extension BinaryIntegerByProxy {
 }
 
 // MARK: - ExpressibleByIntegerLiteral
-public extension BinaryIntegerByProxy {
+public extension BinaryIntegerSynthesizedByProxy {
     init(integerLiteral value: IntegerLiteralType) {
         fatalError("not supported")
     }
 }
 
 // MARK: - Hashable
-public extension BinaryIntegerByProxy {
+public extension BinaryIntegerSynthesizedByProxy {
     func hash(into hasher: inout Hasher) {
         hasher.combine(magnitude)
     }
@@ -93,7 +93,7 @@ public extension BinaryIntegerByProxy {
 
 // MARK: BinaryInteger Arithemtic
 
-public extension BinaryIntegerByProxy {
+public extension BinaryIntegerSynthesizedByProxy {
 
 
     static func / (lhs: Self, rhs: Self) -> Self {
@@ -160,7 +160,7 @@ public extension BinaryIntegerByProxy {
 
 // MARK: BinaryInteger Init
 
-public extension BinaryIntegerByProxy {
+public extension BinaryIntegerSynthesizedByProxy {
     init<T>(truncatingIfNeeded source: T) where T: BinaryInteger {
 //        let magnitude = Magnitude(truncatingIfNeeded: source)
 //        self.init(magnitude: magnitude)
@@ -240,7 +240,7 @@ public extension BinaryIntegerByProxy {
 // swiftlint:enable shorthand_operator
 
 // MARK: - Private Helper
-private extension BinaryIntegerByProxy {
+private extension BinaryIntegerSynthesizedByProxy {
 
     static func calculateOrCrash(_ lhs: Self, _ rhs: Self, _ function: (Self, Self) throws -> Self) -> Self {
         do {
@@ -287,7 +287,7 @@ private extension BinaryIntegerByProxy {
 }
 
 // MARK: - Comparable
-public extension BinaryIntegerByProxy {
+public extension BinaryIntegerSynthesizedByProxy {
     static func < (lhs: Self, rhs: Self) -> Bool {
         return lhs.magnitude < rhs.magnitude
     }

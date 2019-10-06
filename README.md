@@ -1,29 +1,24 @@
 # DelTal
 
-Conform to UnsignedInteger by proxy with the option of adding bounds.
+Conform to [Swift protocol `UnsignedInteger`](https://developer.apple.com/documentation/swift/unsignedinteger) by proxy with the option of adding bounds using a `typealias`.
 
-
-You can create a (completely meaningless) proxied `UInt32` clone called `UI32` like this:
-
-```swift
-typealias UI32 = AnyInteger<UInt32> 
-// ( we will explain `NoTrait` later )
-```
-
-Where actually `AnyInteger` is a `typealias` itself:
-```swift
-typealias AnyInteger<Value: BinaryInteger> = BoundUnsignedInteger<NoBound<Value>, NoTrait> where Value.Magnitude == Value
-
-// (we will explain `NoTrait` later)
-```
-
-## Example
-
-**"Ok, so what?"**
+# Example
 
 Well imagine you want to define a `UInt256` and a `UInt512` and a `UInt4096` or what ever. Using excellent [attaswift/BigInt ](https://github.com/attaswift/BigInt) we have a `BigInt` type. Using that and this pacakge (`DelTal`), we can easily create those types **and let them automagically conform to `UnsignedInteger` protocol**.
 
-### UInt256Bound
+### `UInt256` by a `typealias`
+
+And then:
+```swift
+typealias UInt256 = BoundUnsignedInteger<UInt256Bound, NoTrait>
+
+```
+
+That's it.
+
+The cool part is that our `UInt256` now conforms to `UnsignedInteger` itself. So we can do arithmetic with the type.
+
+### `UInt256Bound`
 
 ```swift
 import BigInt /* attaswift/BigInt */
@@ -35,18 +30,6 @@ extension UInt256Bound{
     static var minValue: Value { BigUInt.zero }
 }
 ```
-
-### UInt256 by a `typealias`
-
-And then:
-```swift
-typealias UInt256 = BoundUnsignedInteger<UInt256Bound, NoTrait>
-
-```
-
-That's it.
-
-The cool part is that our `UInt256` now conforms to `UnsignedInteger` itself. So we can so arithmetic with it just as we want!
 
 ### `Positive256`
 
@@ -70,7 +53,7 @@ extension Positive256Bound{
 ```
 
 
-### Traits
+## Traits
 
 And `IntegerTrait`:
 ```swift
@@ -91,8 +74,11 @@ public struct NoTrait: IntegerTrait {
 
 So what are these traits? We can use them for context so that we might distinguish a `BoundUnsignedInteger` from another, by using the `Trait` instead of the `Bounds`.
 
+# How does it work?
 
-## Etymology 🇸🇪
-_DelTal_ is a play with Swedish words. The English word _"Integer"_ is _"Heltal"_ in Swedish. Replacing `Hel` with `Del`, where `Del` is short for _"Delegerat"_, meaning `Delegated`. 
+`DelTal` uses a generic struct `BoundUnsignedInteger<MagnitudeChecker, Trait>` which conforms to the protocol `UnsignedIntegerSynthesizedByProxy`, which provides the default implementation of the `UnsignedInteger` methods/properites/inits.
 
-In other words, "an Integer by Proxy", but as a Swedish pun.
+# Etymology 🇸🇪
+_"DelTal"_ is a play with Swedish words. The English word _"Integer"_ is _"Heltal"_ in Swedish. Replacing `Hel` with `Del`, where _"Del"_ is short for _"Delegerat"_, meaning _"Delegated"_ in English. 
+
+In other words, "a delegated integer", but as a Swedish pun.

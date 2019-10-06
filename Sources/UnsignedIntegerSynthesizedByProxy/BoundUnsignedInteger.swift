@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct BoundInteger<MagnitudeChecker>: BinaryIntegerSynthesizedByProxy where
+public struct BoundUnsignedInteger<MagnitudeChecker>: UnsignedIntegerSynthesizedByProxy where
     MagnitudeChecker: Bound,
     MagnitudeChecker.Value: BinaryInteger,
     MagnitudeChecker.Value.Magnitude == MagnitudeChecker.Value
@@ -22,7 +22,7 @@ public struct BoundInteger<MagnitudeChecker>: BinaryIntegerSynthesizedByProxy wh
 
 }
 
-public extension BoundInteger {
+public extension BoundUnsignedInteger {
     typealias IntegerLiteralType = Magnitude.IntegerLiteralType
 
     typealias Words = Magnitude.Words

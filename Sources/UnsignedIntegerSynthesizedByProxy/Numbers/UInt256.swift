@@ -7,4 +7,4 @@
 
 import Foundation
 
-public typealias UInt256 = BoundInteger<UInt256Bound>
+public typealias UInt256 = BoundUnsignedInteger<UInt256Bound>

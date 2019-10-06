@@ -1,6 +1,6 @@
 import XCTest
 
-import BinaryIntegerSynthesizedByProxyTests
+import UnsignedIntegerSynthesizedByProxyTests
 
 var tests = [XCTestCaseEntry]()
 tests += UInt256Tests.allTests()

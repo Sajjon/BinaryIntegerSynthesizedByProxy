@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol BinaryIntegerSynthesizedByProxy:
+public protocol UnsignedIntegerSynthesizedByProxy:
     BinaryInteger
     where
     Words == Magnitude.Words,
@@ -10,7 +10,7 @@ public protocol BinaryIntegerSynthesizedByProxy:
     init(check value: Magnitude) throws
 }
 
-public extension BinaryIntegerSynthesizedByProxy {
+public extension UnsignedIntegerSynthesizedByProxy {
     /// Crashing init
     init(magnitude: Magnitude) {
         do {
@@ -21,7 +21,7 @@ public extension BinaryIntegerSynthesizedByProxy {
     }
 }
 
-public extension BinaryIntegerSynthesizedByProxy {
+public extension UnsignedIntegerSynthesizedByProxy {
     var words: Words { magnitude.words }
 
     static var isSigned: Bool { Magnitude.isSigned }
@@ -33,7 +33,7 @@ public extension BinaryIntegerSynthesizedByProxy {
 
 
 // MARK: - Equatable
-public extension BinaryIntegerSynthesizedByProxy {
+public extension UnsignedIntegerSynthesizedByProxy {
 
     static func == (lhs: Self, rhs: Self) -> Bool {
         return forwardMagnitude(lhs, rhs, ==)
@@ -41,7 +41,7 @@ public extension BinaryIntegerSynthesizedByProxy {
 }
 
 // MARK: - Comparable
-public extension BinaryIntegerSynthesizedByProxy {
+public extension UnsignedIntegerSynthesizedByProxy {
     static func < (lhs: Self, rhs: Self) -> Bool {
         return forwardMagnitude(lhs, rhs, <)
     }
@@ -53,7 +53,7 @@ public extension BinaryIntegerSynthesizedByProxy {
 
 
 // MARK: - AdditiveArithmetic
-public extension BinaryIntegerSynthesizedByProxy {
+public extension UnsignedIntegerSynthesizedByProxy {
 
     /// The zero value.
     static var zero: Self { .init(magnitude: .zero) }
@@ -80,14 +80,14 @@ public extension BinaryIntegerSynthesizedByProxy {
 }
 
 // MARK: - ExpressibleByIntegerLiteral
-public extension BinaryIntegerSynthesizedByProxy {
+public extension UnsignedIntegerSynthesizedByProxy {
     init(integerLiteral value: Magnitude.IntegerLiteralType) {
         self.init(magnitude: Magnitude(integerLiteral: value))
     }
 }
 
 // MARK: - Numeric
-public extension BinaryIntegerSynthesizedByProxy {
+public extension UnsignedIntegerSynthesizedByProxy {
     init?<T>(exactly source: T) where T : BinaryInteger {
         guard let magnitude = Magnitude(exactly: source) else { return nil }
         self.init(magnitude: magnitude)
@@ -106,7 +106,7 @@ public extension BinaryIntegerSynthesizedByProxy {
 
 // MARK: BinaryInteger Arithemtic
 
-public extension BinaryIntegerSynthesizedByProxy {
+public extension UnsignedIntegerSynthesizedByProxy {
 
 
     static func / (lhs: Self, rhs: Self) -> Self {
@@ -155,7 +155,7 @@ public extension BinaryIntegerSynthesizedByProxy {
     }
 
     static func >> <RHS>(lhs: Self, rhs: RHS) -> Self where RHS: BinaryInteger {
-        return calculateOrCrashOtherBinaryInteger(lhs, rhs, >>)
+        return calculateOrCrashOtherInteger(lhs, rhs, >>)
     }
 
     static func >>= <RHS>(lhs: inout Self, rhs: RHS) where RHS: BinaryInteger {
@@ -163,7 +163,7 @@ public extension BinaryIntegerSynthesizedByProxy {
     }
 
     static func << <RHS>(lhs: Self, rhs: RHS) -> Self where RHS: BinaryInteger {
-        return calculateOrCrashOtherBinaryInteger(lhs, rhs, <<)
+        return calculateOrCrashOtherInteger(lhs, rhs, <<)
     }
 
     static func <<= <RHS>(lhs: inout Self, rhs: RHS) where RHS: BinaryInteger {
@@ -173,7 +173,7 @@ public extension BinaryIntegerSynthesizedByProxy {
 
 // MARK: BinaryInteger Init
 
-public extension BinaryIntegerSynthesizedByProxy {
+public extension UnsignedIntegerSynthesizedByProxy {
     init<T>(truncatingIfNeeded source: T) where T: BinaryInteger {
         let magnitude = Magnitude(truncatingIfNeeded: source)
         self.init(magnitude: magnitude)
@@ -232,7 +232,7 @@ public extension BinaryIntegerSynthesizedByProxy {
 
 // MARK: - Private Helpers
 
-private extension BinaryIntegerSynthesizedByProxy {
+private extension UnsignedIntegerSynthesizedByProxy {
 
     static func forward(
         _ lhs: Self, _ rhs: Self,
@@ -257,7 +257,7 @@ private extension BinaryIntegerSynthesizedByProxy {
         return combine(mapper(lhs), mapper(rhs))
     }
 
-    static func calculateOrCrashOtherBinaryInteger<RHS>(_ lhs: Self, _ rhs: RHS, _ function: (Self, RHS) throws -> Self) -> Self where RHS: BinaryInteger {
+    static func calculateOrCrashOtherInteger<RHS>(_ lhs: Self, _ rhs: RHS, _ function: (Self, RHS) throws -> Self) -> Self where RHS: BinaryInteger {
         do {
             return try function(lhs, rhs)
         } catch {

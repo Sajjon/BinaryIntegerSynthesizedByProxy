@@ -11,7 +11,7 @@ import BigInt /* attaswift/BigInt */
 public struct UInt256Bound: Bound {}
 public extension UInt256Bound{
     typealias Value = BigUInt
-    static var maxValue: Value? { BigUInt(2).power(256) - 1 }
-    static var minValue: Value? { BigUInt.zero }
+    static var maxValue: Value { BigUInt(2).power(256) - 1 }
+    static var minValue: Value { BigUInt.zero }
 }
 

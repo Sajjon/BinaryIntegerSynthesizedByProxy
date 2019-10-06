@@ -7,7 +7,9 @@
 
 import Foundation
 
-public struct NoBound<Value>: Bound where Value: Validatable {
-    public static var maxValue: Value? { nil }
-    public static var minValue: Value? { nil }
+public struct NoBound<Value>: ValueChecker where Value: Validatable {
+
+    public static func withinBound(value: Value) throws -> Validated<Value> {
+        return Validated(validated: value)
+    }
 }

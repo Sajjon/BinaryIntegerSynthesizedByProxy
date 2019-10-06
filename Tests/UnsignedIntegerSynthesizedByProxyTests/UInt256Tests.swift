@@ -5,11 +5,38 @@ import BigInt
 final class UInt256Tests: XCTestCase {
 
     static var allTests = [
+        ("testEmptyInitResultsInZero", testEmptyInitResultsInZero),
+        ("testMax", testMax),
+        ("testMin", testMin),
         ("testEquatable", testEquatable),
         ("testAddition", testAddition),
         ("testSubtraction", testSubtraction),
         ("testMultiplication", testMultiplication),
     ]
+
+    func testEmptyInitResultsInZero() {
+        XCTAssertEqual(UInt256().magnitude, 0)
+    }
+
+    func testMax() {
+        XCTAssertEqual(
+            UInt256.max.magnitude,
+            UInt256Bound.maxValue
+        )
+    }
+
+    func testMin() {
+        XCTAssertEqual(
+            UInt256.min.magnitude,
+            UInt256Bound.minValue
+        )
+
+        XCTAssertEqual(
+            UInt256.min,
+            UInt256()
+        )
+    }
+
 
     // MARK: - Equatable
     func testEquatable() {

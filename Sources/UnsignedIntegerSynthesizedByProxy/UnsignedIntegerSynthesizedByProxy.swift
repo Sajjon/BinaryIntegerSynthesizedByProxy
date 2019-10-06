@@ -1,12 +1,13 @@
 import Foundation
 
 public protocol UnsignedIntegerSynthesizedByProxy:
-    BinaryInteger
-    where
+    UnsignedInteger
+where
     Words == Magnitude.Words,
     MagnitudeChecker.Value == Magnitude
 {
     associatedtype MagnitudeChecker: ValueChecker
+    var magnitude: Magnitude { get }
     init(check value: Magnitude) throws
 }
 
@@ -171,35 +172,21 @@ public extension UnsignedIntegerSynthesizedByProxy {
     }
 }
 
-// MARK: BinaryInteger Init
+// swiftlint:enable shorthand_operator
 
+
+// MARK: BinaryInteger Init
 public extension UnsignedIntegerSynthesizedByProxy {
-    init<T>(truncatingIfNeeded source: T) where T: BinaryInteger {
-        let magnitude = Magnitude(truncatingIfNeeded: source)
-        self.init(magnitude: magnitude)
-        //        if magnitude > Bound.greatestFiniteMagnitude {
-        //            self.magnitude = Bound.greatestFiniteMagnitude
-        //        } else if magnitude < Bound.leastNormalMagnitude {
-        //            self.magnitude = Bound.leastNormalMagnitude
-        //        } else {
-        //            self.magnitude = magnitude
-        //        }
-    }
 
     init?<T>(exactly source: T) where T: BinaryFloatingPoint {
         guard let magnitude = Magnitude(exactly: source) else { return nil }
-        try? self.init(magnitude: magnitude)
-    }
-
-    /// Creates the least possible amount
-    init() {
-        self.init(magnitude: Magnitude.zero)
+        try? self.init(check: magnitude)
     }
 
     init<T>(_ source: T) where T: BinaryInteger {
         let magnitude = Magnitude(source)
         do {
-            try self.init(magnitude: magnitude)
+            try self.init(check: magnitude)
         } catch {
             badLiteralValue(source, error: error)
         }
@@ -208,27 +195,76 @@ public extension UnsignedIntegerSynthesizedByProxy {
     init<T>(_ source: T) where T: BinaryFloatingPoint {
         let magnitude = Magnitude(source)
         do {
-            try self.init(magnitude: magnitude)
+            try self.init(check: magnitude)
         } catch {
             badLiteralValue(source, error: error)
         }
     }
-
-    init<T>(clamping source: T) where T: BinaryInteger {
-        let magnitude = Magnitude(clamping: source)
-        //        if magnitude > Bound.greatestFiniteMagnitude {
-        //            self.magnitude = Bound.greatestFiniteMagnitude
-        //        } else if magnitude < Bound.leastNormalMagnitude {
-        //            self.magnitude = Bound.leastNormalMagnitude
-        //        } else {
-        //            self.magnitude = magnitude
-        //        }
-        self.init(magnitude: magnitude)
-    }
 }
 
 
-// swiftlint:enable shorthand_operator
+// MARK: BinaryInteger where Bound
+public extension UnsignedIntegerSynthesizedByProxy where MagnitudeChecker: Bound {
+
+    /// The maximum representable integer in this type.
+    static var max: Self {
+        .init(magnitude: Self.maxMagnitude)
+    }
+
+    /// The minimum representable integer in this type.
+    static var min: Self {
+        .init(magnitude: Self.minMagnitude)
+    }
+
+    static var maxMagnitude: Magnitude { MagnitudeChecker.maxValue }
+    static var minMagnitude: Magnitude { MagnitudeChecker.minValue }
+
+    init<T>(clamping source: T) where T: BinaryInteger {
+        let magnitude = Magnitude(clamping: source)
+
+        if magnitude > Self.maxMagnitude {
+            self.init(magnitude: Self.maxMagnitude)
+        } else if magnitude < Self.minMagnitude {
+            self.init(magnitude: Self.minMagnitude)
+        } else {
+            self.init(magnitude: magnitude)
+        }
+    }
+
+    init<T>(truncatingIfNeeded source: T) where T: BinaryInteger {
+        let magnitude = Magnitude(truncatingIfNeeded: source)
+        if magnitude > Self.maxMagnitude {
+            self.init(magnitude: Self.maxMagnitude)
+        } else if magnitude < Self.minMagnitude {
+            self.init(magnitude: Self.minMagnitude)
+        } else {
+            self.init(magnitude: magnitude)
+        }
+    }
+
+    /// Creates the least possible amount
+    init() {
+        self.init(magnitude: Self.minMagnitude)
+    }
+}
+
+// MARK: BinaryInteger not Bound
+public extension UnsignedIntegerSynthesizedByProxy {
+    init<T>(clamping source: T) where T: BinaryInteger {
+        let magnitude = Magnitude(clamping: source)
+        self.init(magnitude: magnitude)
+    }
+
+    init<T>(truncatingIfNeeded source: T) where T: BinaryInteger {
+        let magnitude = Magnitude(truncatingIfNeeded: source)
+        self.init(magnitude: magnitude)
+    }
+
+    /// Creates the least possible amount
+    init() {
+        self.init(magnitude: Magnitude.zero)
+    }
+}
 
 // MARK: - Private Helpers
 

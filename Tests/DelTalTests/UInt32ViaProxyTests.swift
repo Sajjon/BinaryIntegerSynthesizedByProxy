@@ -21,7 +21,15 @@ class UInt32ViaProxyTests: XCTestCase {
         ("testSubtraction", testSubtraction),
         ("testMultiplication", testMultiplication),
         ("testMin", testMin),
+        ("testDenomination", testDenomination),
     ]
+
+    func testDenomination() {
+        XCTAssertEqual(
+            UI32(magnitude: 1, denomination: .kilo).magnitude,
+            1000
+        )
+    }
 
     func testCompareMagnitudeToUInt32() {
         XCTAssertEqual(UI32.zero.magnitude, UInt32.zero.magnitude)

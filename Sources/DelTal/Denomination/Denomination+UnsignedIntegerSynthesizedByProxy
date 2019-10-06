@@ -1,0 +1,73 @@
+//
+//  File.swift
+//  
+//
+//  Created by Alexander Cyon on 2019-10-06.
+//
+
+import Foundation
+
+public enum IntegerFromStringError: Swift.Error, Equatable {
+    case stringNotANumber(String)
+    case amountMustBePositive
+    case amountInAttoIsOnlyMeasuredInIntegers(butPassedDouble: Double)
+    case amountFromStringNotRepresentableInDenomination(amountString: String, specifiedDenomination: Denomination)
+}
+
+public extension UnsignedIntegerSynthesizedByProxy {
+
+    init(string: String, denomination from: Denomination) throws {
+        let numberFormatter: NumberFormatter = .default
+        let decimalSeparator = Locale.decimalSeparatorIndeed
+
+        func magnitudeFromNonDecimalString(_ nonDecimalString: String) throws -> Magnitude {
+
+            assert(!nonDecimalString.contains(decimalSeparator))
+            guard let magnitudeFromString = Magnitude(nonDecimalString, radix: 10) else {
+                throw IntegerFromStringError.stringNotANumber(string)
+            }
+            guard magnitudeFromString > .zero else {
+                throw IntegerFromStringError.amountMustBePositive
+            }
+            return magnitudeFromString
+
+        }
+
+        if let decimalSeparatorIndex = string.index(of: decimalSeparator) {
+            let numberOfDecimals = string.distance(from: decimalSeparatorIndex, to: string.endIndex) - 1
+            let exponentDelta = abs(Self.measuredIn.exponent - from.exponent)
+
+            if exponentDelta < numberOfDecimals {
+                throw IntegerFromStringError.amountFromStringNotRepresentableInDenomination(amountString: string, specifiedDenomination: from)
+            } else {
+                let amountStringWithDecimalDropped = string.replacingOccurrences(of: decimalSeparator, with: "")
+                var amountMeasuredInAttoDroppedDecimals = try magnitudeFromNonDecimalString(amountStringWithDecimalDropped)
+
+                if exponentDelta > numberOfDecimals {
+                    let exponent = exponentDelta - numberOfDecimals
+
+                    let factorInt = Int(pow(Double(10), Double(exponent)))
+                    let factor = Magnitude(factorInt)
+                    amountMeasuredInAttoDroppedDecimals *= factor
+                }
+
+                try self.init(magnitudeInSmallestPossibleDenomination: amountMeasuredInAttoDroppedDecimals)
+            }
+        } else {
+            let magnitudeUnconverted = try magnitudeFromNonDecimalString(string)
+            try self.init(magnitude: magnitudeUnconverted, denomination: from)
+        }
+    }
+
+    @available(*, deprecated, message: "_NOT_ deprecated, but a word of caution: `Double` might lose precision after a certain amount of decimals, consider using `init(positiveAmount:denomination)` or `init(string:denomination)` (which this init delegates to anyway) instead")
+    init(double: Double, denomination from: Denomination) throws {
+        guard from.exponent > Self.measuredIn.exponent else {
+            throw IntegerFromStringError.amountInAttoIsOnlyMeasuredInIntegers(butPassedDouble: double)
+        }
+        guard let numberString = NumberFormatter.default.string(from: NSNumber(value: double)) else {
+            incorrectImplementationShouldAlwaysBeAble(to: "Format a number string from double value: \(double)")
+        }
+        try self.init(string: numberString, denomination: from)
+    }
+}
+

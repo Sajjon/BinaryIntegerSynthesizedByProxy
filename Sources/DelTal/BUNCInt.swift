@@ -14,7 +14,7 @@ public struct BUNCInt<MagnitudeChecker, Name, Category>:
     CustomDebugStringConvertible
 where
     MagnitudeChecker: ValueChecker,
-    MagnitudeChecker.Value: BinaryInteger,
+    MagnitudeChecker.Value: ExponentiatableInteger,
     MagnitudeChecker.Value.Magnitude == MagnitudeChecker.Value,
     Name: IntegerName,
     Category: IntegerCategory
@@ -23,8 +23,21 @@ where
     public typealias Magnitude = MagnitudeChecker.Value
 
     public let magnitude: Magnitude
-    public init(check value: Magnitude) throws {
-        magnitude = try MagnitudeChecker.withinBound(value: value).validated
+//
+//    public init(check value: Magnitude, denomination _: Denomination) throws{
+//        magnitude = try MagnitudeChecker.withinBound(value: value).validated
+//    }
+
+
+    public init(check magnitude: Magnitude, denomination: Denomination = Self.minDenomination) throws {
+
+        let converted = try Denomination.convertMagnitude(
+            magnitude,
+            from: denomination,
+            to: MagnitudeChecker.magnitudeMeasuiredInDenomination
+        )
+
+        self.magnitude = try MagnitudeChecker.withinBound(value: converted).validated
     }
 
 }

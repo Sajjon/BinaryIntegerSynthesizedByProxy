@@ -11,7 +11,7 @@ public typealias AnyUnsignedInteger<Value> = BUNCInt<
     NoBound<Value>,
     AnyUnsignedIntegerName,
     InfiniteInteger
-> where Value: BinaryInteger, Value.Magnitude == Value
+> where Value: ExponentiatableInteger, Value.Magnitude == Value
 
 public struct InfiniteInteger: IntegerCategory {
     public static let nameOfCategory = "Infinite Integer"

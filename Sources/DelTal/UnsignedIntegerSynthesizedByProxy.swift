@@ -8,14 +8,30 @@ where
 {
     associatedtype MagnitudeChecker: ValueChecker
     var magnitude: Magnitude { get }
-    init(check value: Magnitude) throws
+    init(check value: Magnitude, denomination: Denomination) throws
 }
 
 public extension UnsignedIntegerSynthesizedByProxy {
-    /// Crashing init
-    init(magnitude: Magnitude) {
+    // Default `magnitudeMeasuiredInDenomination` is `whole`.
+    static var magnitudeMeasuiredInDenomination: Denomination { MagnitudeChecker.magnitudeMeasuiredInDenomination }
+
+    // Default `minDenomination` is `whole`.
+    static var minDenomination: Denomination { MagnitudeChecker.minDenomination }
+}
+
+public extension UnsignedIntegerSynthesizedByProxy {
+
+    /// Validating init using denomination `Self.minDenomination`
+    init(
+        check value: Magnitude
+    ) throws {
+        try self.init(check: value, denomination: Self.minDenomination)
+    }
+
+    /// Crashing init defaulting to use denomination `Self.minDenomination`
+    init(magnitude: Magnitude, denomination: Denomination = Self.minDenomination) {
         do {
-            try self.init(check: magnitude)
+            try self.init(check: magnitude, denomination: denomination)
         } catch {
             badLiteralValue(magnitude, error: error)
         }

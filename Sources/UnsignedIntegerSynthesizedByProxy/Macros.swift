@@ -37,3 +37,6 @@ internal func badLiteralValue<Value>(
     fatalError(message)
 }
 
+internal var boundDoesNotIncludeZero: Never {
+    fatalError("Bound does not include zero.")
+}

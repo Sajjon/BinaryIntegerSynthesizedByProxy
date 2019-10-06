@@ -8,6 +8,7 @@ final class UInt256Tests: XCTestCase {
         ("testEmptyInitResultsInZero", testEmptyInitResultsInZero),
         ("testMax", testMax),
         ("testMin", testMin),
+        ("testMinIsZero", testMinIsZero),
         ("testEquatable", testEquatable),
         ("testAddition", testAddition),
         ("testSubtraction", testSubtraction),
@@ -22,6 +23,13 @@ final class UInt256Tests: XCTestCase {
         XCTAssertEqual(
             UInt256.max.magnitude,
             UInt256Bound.maxValue
+        )
+    }
+
+    func testMinIsZero() {
+        XCTAssertEqual(
+            UInt256.min,
+            UInt256.zero
         )
     }
 

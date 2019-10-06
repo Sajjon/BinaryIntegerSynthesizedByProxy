@@ -59,6 +59,9 @@ public extension UnsignedIntegerSynthesizedByProxy {
     /// The zero value.
     static var zero: Self { .init(magnitude: .zero) }
 
+    /// The minimum representable integer in this type.
+    static var min: Self { .zero }
+
     /// Adds two values and produces their sum.
     static func + (_ lhs: Self, _ rhs: Self) -> Self {
         forward(lhs, rhs, +)
@@ -202,13 +205,21 @@ public extension UnsignedIntegerSynthesizedByProxy {
     }
 }
 
-
 // MARK: BinaryInteger where Bound
 public extension UnsignedIntegerSynthesizedByProxy where MagnitudeChecker: Bound {
 
     /// The maximum representable integer in this type.
     static var max: Self {
         .init(magnitude: Self.maxMagnitude)
+    }
+
+    /// The zero value.
+    static var zero: Self { //.init(magnitude: .zero) }
+        let zeroMagnitude = Magnitude.zero
+        guard minMagnitude <= zeroMagnitude else {
+            boundDoesNotIncludeZero
+        }
+        return .init(magnitude: zeroMagnitude)
     }
 
     /// The minimum representable integer in this type.

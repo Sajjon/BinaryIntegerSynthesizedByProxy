@@ -14,7 +14,7 @@ final class Positive256Tests: XCTestCase {
     static var allTests = [
         ("testEmptyInitResultsInOne", testEmptyInitResultsInOne),
         ("testMax", testMax),
-        ("testMin", testMin),
+        ("testMin", testMin)
     ]
 
     func testEmptyInitResultsInOne() {
